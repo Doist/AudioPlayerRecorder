@@ -9,9 +9,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageButton;
 
-public class PlayPauseImageButton extends ImageButton implements View.OnClickListener {
+import androidx.appcompat.widget.AppCompatImageButton;
+
+public class PlayPauseImageButton extends AppCompatImageButton implements View.OnClickListener {
     private boolean mIsPlaying;
 
     private int mPlayResId;
