@@ -2,7 +2,11 @@ apply plugin: 'com.android.library'
 
 android {
     namespace "com.heavyplayer.audioplayerrecorder"
-    compileSdkVersion 33
+    compileSdk 33
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         minSdkVersion 15
