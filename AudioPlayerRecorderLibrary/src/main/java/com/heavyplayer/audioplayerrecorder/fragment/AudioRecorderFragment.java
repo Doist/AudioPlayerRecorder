@@ -139,6 +139,16 @@ public class AudioRecorderFragment extends DialogFragment
     }
 
     @Override
+    public void onServiceStart() {
+        // Purposely empty.
+    }
+
+    @Override
+    public void onServiceFailedToStart(String processName, int importance) {
+        // Purposely empty.
+    }
+
+    @Override
     public void onStartRecorder() {
         Activity activity = getActivity();
         if (activity != null) {

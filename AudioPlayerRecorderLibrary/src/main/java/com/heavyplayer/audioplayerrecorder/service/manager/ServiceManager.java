@@ -48,6 +48,13 @@ public class ServiceManager implements ServiceConnection {
                 // Only start the service if we are actually in the foreground.
                 // https://issuetracker.google.com/issues/110237673
                 startService();
+            } else {
+                if (mStateListener != null) {
+                    mStateListener.onServiceFailedToStart(
+                            runningAppProcesses.get(0).processName,
+                            importance
+                    );
+                }
             }
         }
     }
@@ -61,6 +68,9 @@ public class ServiceManager implements ServiceConnection {
     }
 
     protected void startService() {
+        if (mStateListener != null) {
+            mStateListener.onServiceStart();
+        }
         mActivity.startService(new Intent(mActivity, mServiceClass));
     }
 
@@ -133,5 +143,9 @@ public class ServiceManager implements ServiceConnection {
         void onServiceUnbind(IBinder binder);
 
         void onServiceStop();
+
+        void onServiceStart();
+
+        void onServiceFailedToStart(String processName, int importance);
     }
 }
