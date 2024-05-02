@@ -47,6 +47,14 @@ public class PlayerActivity extends RecorderActivity {
             @Override
             public void onServiceStop() {
             }
+
+            @Override
+            public void onServiceStart() {
+            }
+
+            @Override
+            public void onServiceFailedToStart(String processName, int importance) {
+            }
         });
     }
 

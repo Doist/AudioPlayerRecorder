@@ -1,8 +1,7 @@
 package com.heavyplayer.audioplayerrecorder.service.manager;
 
-import com.heavyplayer.audioplayerrecorder.BuildConfig;
-
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,6 +9,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.heavyplayer.audioplayerrecorder.BuildConfig;
+
+import java.util.List;
 
 public class ServiceManager implements ServiceConnection {
     private IBinder mBinder;
@@ -37,9 +40,23 @@ public class ServiceManager implements ServiceConnection {
     protected void onActivateService() {
         bindService();
 
-        // Ensure service keeps running until we explicitly stop it,
-        // which is always except when configuration changes occur.
-        startService();
+        ActivityManager activityManager = (ActivityManager) mActivity.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = activityManager.getRunningAppProcesses();
+        if (runningAppProcesses != null) {
+            int importance = runningAppProcesses.get(0).importance;
+            if (importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                // Only start the service if we are actually in the foreground.
+                // https://issuetracker.google.com/issues/110237673
+                startService();
+            } else {
+                if (mStateListener != null) {
+                    mStateListener.onServiceFailedToStart(
+                            runningAppProcesses.get(0).processName,
+                            importance
+                    );
+                }
+            }
+        }
     }
 
     protected void onDeactivateService(boolean stopService) {
@@ -51,6 +68,9 @@ public class ServiceManager implements ServiceConnection {
     }
 
     protected void startService() {
+        if (mStateListener != null) {
+            mStateListener.onServiceStart();
+        }
         mActivity.startService(new Intent(mActivity, mServiceClass));
     }
 
@@ -123,5 +143,9 @@ public class ServiceManager implements ServiceConnection {
         void onServiceUnbind(IBinder binder);
 
         void onServiceStop();
+
+        void onServiceStart();
+
+        void onServiceFailedToStart(String processName, int importance);
     }
 }
